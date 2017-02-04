@@ -47,7 +47,7 @@ export default({ config, db }) => {
   });
 
   // '/v1/restaurant/:id' - Update
-  api.put('/:id', (req, res) => {
+  api.put('/:id', authenticate, (req, res) => {
     FoodTruck.findById(req.params.id, (err, foodtruck) => {
       if (err) {
         res.send(err);
