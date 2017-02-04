@@ -11,7 +11,7 @@ export default({ config, db }) => {
 
   // CRUD - Create Read Update Delete
   // '/v1/foodtruck/add' - Create
-  api.post('/add', authenticate, (req, res) => { //add word authenticate to lock down
+  api.post('/add', (req, res) => { //add word authenticate to lock down
     let newFoodTruck = new FoodTruck();
     newFoodTruck.name = req.body.name;
     newFoodTruck.foodtype = req.body.foodtype;
@@ -47,7 +47,7 @@ export default({ config, db }) => {
   });
 
   // '/v1/restaurant/:id' - Update
-  api.put('/:id', authenticate, (req, res) => {
+  api.put('/:id', (req, res) => {
     FoodTruck.findById(req.params.id, (err, foodtruck) => {
       if (err) {
         res.send(err);
