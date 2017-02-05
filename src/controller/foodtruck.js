@@ -71,7 +71,7 @@ export default({ config, db }) => {
 
   // '/v1/restaurant/:id' - Delete
   api.delete('/:id', authenticate, (req, res) => {
-    FoodTruck.findById(req.params.id, (err, foodtruck) +> {
+    FoodTruck.findById(req.params.id, (err, foodtruck) => {
       if (err) {
         res.status(500).send(err);
         return;
