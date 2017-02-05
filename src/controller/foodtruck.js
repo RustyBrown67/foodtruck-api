@@ -11,12 +11,13 @@ export default({ config, db }) => {
 
   // CRUD - Create Read Update Delete
   // '/v1/foodtruck/add' - Create
-  api.post('/add', (req, res) => { //add word authenticate to lock down
+  api.post('/add', authenticate, (req, res) => { //add word authenticate to lock down
     let newFoodTruck = new FoodTruck();
     newFoodTruck.name = req.body.name;
     newFoodTruck.foodtype = req.body.foodtype;
     newFoodTruck.avgcost = req.body.avgcost;
-    newFoodTruck.geometry.coordinates = req.body.geometry.coordinates;
+    newFoodTruck.geometry.coordinates.lat = req.body.geometry.coordinates.lat;
+    newFoodTruck.geometry.coordinates.long = req.body.geometry.coordinates.long;
 
     newFoodTruck.save(function(err) {
       if (err) {
@@ -56,7 +57,8 @@ export default({ config, db }) => {
       foodtruck.text = req.body.text;
       foodtruck.foodtype = req.body.foodtype;
       foodtruck.avgcost = req.body.avgcost;
-      foodtruck.geometry.coordinates = req.body.geometry.coordinates;
+      foodtruck.geometry.coordinates.lat = req.body.geometry.coordinates.lat;
+      foodtruck.geometry.coordinates.long = req.body.geometry.coordinates.long;
 
       foodtruck.save(function(err) {
         if (err) {
@@ -69,19 +71,31 @@ export default({ config, db }) => {
 
   // '/v1/restaurant/:id' - Delete
   api.delete('/:id', authenticate, (req, res) => {
-    FoodTruck.remove({
-      _id: req.params.id
-    }, (err, foodtruck) => {
+    FoodTruck.findById(req.params.id, (err, foodtruck) +> {
       if (err) {
-        res.send(err);
+        res.status(500).send(err);
+        return;
       }
-      Review.remove({
-        foodtruck: req.params.id
-      }, (err, review) => {
+      if (foodtruck === null) {
+        res.status(404).send("FoodTruck not found");
+        return;
+      }
+      FoodTruck.remove({
+        _id: req.params.id
+      }, (err, foodtruck) => {
         if (err) {
-          res.send(err);
+          res.status(500).send(err);
+          return;
         }
-        res.json({ message: "Food Truck and Reviews Successfully Removed!"});
+        Review.remove({
+          foodtruck: req.params.id
+        }, (err, review) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+          res.json({ message: "Food Truck and Reviews Successfully Removed!"});
+        });
       });
     });
   });
